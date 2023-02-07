@@ -36,10 +36,10 @@ private final ProductService productService;
     @PostMapping("/add_product")
     public ResponseEntity<?> addProduct(@RequestBody Product product){
 
-        if (customer.getRole().equals("USER")){
-
-            throw  new ApiException("U not an Admin");
-        }
+//        if (customer.getRole().equals("USER")){
+//
+//            throw  new ApiException("U not an Admin");
+//        }
             productService.addProduct(product);
             return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("product is added", 201));
 

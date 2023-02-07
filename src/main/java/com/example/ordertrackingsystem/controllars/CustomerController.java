@@ -1,12 +1,15 @@
 package com.example.ordertrackingsystem.controllars;
 
 import com.example.ordertrackingsystem.modals.ApiResponse;
-import com.example.ordertrackingsystem.modals.Customer;
+import com.example.ordertrackingsystem.pojo.AuthenticationRequest;
 import com.example.ordertrackingsystem.pojo.CustomerPojo;
 import com.example.ordertrackingsystem.services.CustomerService;
+import com.example.ordertrackingsystem.services.MyUserDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +22,17 @@ import javax.validation.Valid;
 public class CustomerController {
 
 
+    private final AuthenticationManager authenticationManager;
     @Autowired
     private final CustomerService customerService;
+    @Autowired
+    private final MyUserDetail myUserDetail;
 
-    public CustomerController(CustomerService customerService) {
+
+    public CustomerController(AuthenticationManager authenticationManager, CustomerService customerService, MyUserDetail myUserDetail) {
+        this.authenticationManager = authenticationManager;
         this.customerService = customerService;
+        this.myUserDetail = myUserDetail;
     }
 
 
@@ -62,7 +71,9 @@ public class CustomerController {
     }
 
     @PostMapping("/admin_login")
-    public ResponseEntity<?> adminLogin(){
+    public ResponseEntity<?> adminLogin(@RequestBody AuthenticationRequest request){
+authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
+myUserDetail.loadUserByUsername(request.getUsername());
         return ResponseEntity.status(200).body(new ApiResponse("welcome back Admin",200));
 
 
